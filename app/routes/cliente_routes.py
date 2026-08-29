@@ -43,4 +43,4 @@ def atualizar_cliente(cliente_id: int):
 @cliente_bp.delete("/<int:cliente_id>")
 def remover_cliente(cliente_id: int):
     cliente_service.remover(cliente_id)
-    return jsonify({"message": "Cliente removido com sucesso."}), 200
+    return "", 204
