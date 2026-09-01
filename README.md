@@ -105,22 +105,25 @@ USE locadora;
 SHOW TABLES;
 ```
 
-A tabela `clientes` deverá estar presente.
+As tabelas `clientes`, `categorias` e `filmes` deverão estar presentes.
 
-Para verificar sua estrutura:
+Para verificar a estrutura de `filmes`:
 
 ```sql
-DESCRIBE clientes;
+DESCRIBE filmes;
 ```
 
 A tabela deverá possuir os campos:
 
 ```text
 id
-nome
-cpf
-email
-telefone
+titulo
+descricao
+ano
+duracao
+estoque
+disponivel
+categoria_id
 ```
 
 ## Executar a aplicação
@@ -464,6 +467,235 @@ Status:
 204 NO CONTENT
 ```
 
+# API de Filmes
+
+A API possui operações de criação, consulta, atualização e remoção de filmes, além de locação e devolução.
+
+O filme deve estar associado a uma categoria já cadastrada. O título é obrigatório. O estoque não pode ser negativo; se omitido na criação, assume `0`. O campo `disponivel` é calculado pelo sistema (`true` quando o estoque é maior que zero) e não deve ser enviado no payload.
+
+## Criar filme
+
+```http
+POST http://127.0.0.1:5000/api/filmes
+```
+
+Body:
+
+```json
+{
+    "titulo": "Interestelar",
+    "descricao": "Viagem espacial",
+    "ano": 2014,
+    "duracao": 169,
+    "estoque": 3,
+    "categoria_id": 1
+}
+```
+
+Resposta esperada:
+
+```json
+{
+    "id": 1,
+    "titulo": "Interestelar",
+    "descricao": "Viagem espacial",
+    "ano": 2014,
+    "duracao": 169,
+    "estoque": 3,
+    "disponivel": true,
+    "categoria_id": 1
+}
+```
+
+Status:
+
+```text
+201 Created
+```
+
+## Listar filmes
+
+```http
+GET http://127.0.0.1:5000/api/filmes
+```
+
+Resposta:
+
+```json
+[
+    {
+        "id": 1,
+        "titulo": "Interestelar",
+        "descricao": "Viagem espacial",
+        "ano": 2014,
+        "duracao": 169,
+        "estoque": 3,
+        "disponivel": true,
+        "categoria_id": 1
+    }
+]
+```
+
+Status:
+
+```text
+200 OK
+```
+
+## Buscar filme por ID
+
+```http
+GET http://127.0.0.1:5000/api/filmes/1
+```
+
+Resposta:
+
+```json
+{
+    "id": 1,
+    "titulo": "Interestelar",
+    "descricao": "Viagem espacial",
+    "ano": 2014,
+    "duracao": 169,
+    "estoque": 3,
+    "disponivel": true,
+    "categoria_id": 1
+}
+```
+
+Status:
+
+```text
+200 OK
+```
+
+## Atualizar filme — PUT
+
+O `PUT` substitui os dados do filme. Os campos obrigatórios (`titulo` e `categoria_id`) devem ser enviados. Se `estoque` não for enviado, assume `0`.
+
+```http
+PUT http://127.0.0.1:5000/api/filmes/1
+```
+
+Body:
+
+```json
+{
+    "titulo": "Interestelar",
+    "descricao": "Ficção científica",
+    "ano": 2014,
+    "duracao": 169,
+    "estoque": 5,
+    "categoria_id": 1
+}
+```
+
+Status:
+
+```text
+200 OK
+```
+
+## Atualizar filme — PATCH
+
+O `PATCH` permite alterar apenas os campos desejados.
+
+```http
+PATCH http://127.0.0.1:5000/api/filmes/1
+```
+
+Body:
+
+```json
+{
+    "estoque": 5
+}
+```
+
+Status:
+
+```text
+200 OK
+```
+
+## Remover filme
+
+```http
+DELETE http://127.0.0.1:5000/api/filmes/1
+```
+
+Resposta:
+
+```json
+{
+    ""
+}
+```
+
+Status:
+
+```text
+204 NO CONTENT
+```
+
+## Alugar filme
+
+Um filme só pode ser alugado se estiver disponível. Ao alugar, o estoque é reduzido em 1 e `disponivel` é atualizado.
+
+```http
+POST http://127.0.0.1:5000/api/filmes/1/alugar
+```
+
+Resposta esperada:
+
+```json
+{
+    "id": 1,
+    "titulo": "Interestelar",
+    "descricao": "Viagem espacial",
+    "ano": 2014,
+    "duracao": 169,
+    "estoque": 2,
+    "disponivel": true,
+    "categoria_id": 1
+}
+```
+
+Status:
+
+```text
+200 OK
+```
+
+## Devolver filme
+
+Ao devolver, o estoque é aumentado em 1 e `disponivel` é atualizado.
+
+```http
+POST http://127.0.0.1:5000/api/filmes/1/devolver
+```
+
+Resposta esperada:
+
+```json
+{
+    "id": 1,
+    "titulo": "Interestelar",
+    "descricao": "Viagem espacial",
+    "ano": 2014,
+    "duracao": 169,
+    "estoque": 3,
+    "disponivel": true,
+    "categoria_id": 1
+}
+```
+
+Status:
+
+```text
+200 OK
+```
+
 # Tratamento de erros
 
 As API's possuem tratamentos centralizados de erros através do arquivo `errors.py`.
@@ -582,6 +814,113 @@ Status:
 409 Conflict
 ```
 
+## Filme não encontrado — 404
+
+```http
+GET http://127.0.0.1:5000/api/filmes/9999
+```
+
+Resposta:
+
+```json
+{
+    "code": 404,
+    "name": "RecursoNaoEncontrado",
+    "description": "Filme 9999 não encontrado."
+}
+```
+
+Status:
+
+```text
+404 Not Found
+```
+
+## Categoria inexistente no filme — 422
+
+Ao cadastrar um filme com um `categoria_id` que não existe:
+
+```json
+{
+    "titulo": "Matrix",
+    "estoque": 1,
+    "categoria_id": 999
+}
+```
+
+Resposta:
+
+```json
+{
+    "code": 422,
+    "name": "ReferenciaInvalida",
+    "description": "Categoria 999 não encontrada."
+}
+```
+
+Status:
+
+```text
+422 Unprocessable Entity
+```
+
+## Estoque negativo — 422
+
+Ao cadastrar ou atualizar um filme com estoque negativo:
+
+```json
+{
+    "titulo": "Matrix",
+    "estoque": -1,
+    "categoria_id": 1
+}
+```
+
+Resposta:
+
+```json
+{
+    "code": 422,
+    "name": "Unprocessable Entity",
+    "description": "Falha na validação do payload.",
+    "errors": {
+        "estoque": [
+            "Must be greater than or equal to 0."
+        ]
+    }
+}
+```
+
+Status:
+
+```text
+422 Unprocessable Entity
+```
+
+## Filme indisponível para locação — 409
+
+Ao tentar alugar um filme com estoque `0`:
+
+```http
+POST http://127.0.0.1:5000/api/filmes/1/alugar
+```
+
+Resposta:
+
+```json
+{
+    "code": 409,
+    "name": "RegraDeNegocio",
+    "description": "Filme indisponível para locação."
+}
+```
+
+Status:
+
+```text
+409 Conflict
+```
+
 # Resumo dos endpoints
 
 | Método | Endpoint              | Descrição                        | Status |
@@ -599,6 +938,14 @@ Status:
 | PUT    | `/api/categorias/{id}`| Substitui os dados da categoria  | 200    |
 | PATCH  | `/api/categorias/{id}`| Atualiza parcialmente a categoria| 200    |
 | DELETE | `/api/categorias/{id}`| Remove uma categoria             | 200    |
+| GET    | `/api/filmes`         | Lista todos os filmes            | 200    |
+| GET    | `/api/filmes/{id}`    | Busca um filme por ID            | 200    |
+| POST   | `/api/filmes`         | Cria um novo filme               | 201    |
+| PUT    | `/api/filmes/{id}`    | Substitui os dados do filme      | 200    |
+| PATCH  | `/api/filmes/{id}`    | Atualiza parcialmente o filme    | 200    |
+| DELETE | `/api/filmes/{id}`    | Remove um filme                  | 200    |
+| POST   | `/api/filmes/{id}/alugar` | Aluga um filme (reduz estoque) | 200    |
+| POST   | `/api/filmes/{id}/devolver` | Devolve um filme (aumenta estoque) | 200 |
 
 ## Fluxo para executar o projeto após o clone
 
