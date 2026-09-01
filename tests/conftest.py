@@ -32,22 +32,21 @@ def client(app):
 
 @pytest.fixture
 def categoria(client) -> dict:
-    resposta = client.post(
-        "/api/categorias",
-        json={"nome": "Eletrônicos", "descricao": "Tecnologia em geral"},
-    )
+    resposta = client.post("/api/categorias", json={"nome": "Ficção Científica"})
     assert resposta.status_code == 201
     return resposta.get_json()
 
 
 @pytest.fixture
-def produto(client, categoria) -> dict:
+def filme(client, categoria) -> dict:
     resposta = client.post(
-        "/api/produtos",
+        "/api/filmes",
         json={
-            "nome": "Mouse Sem Fio",
-            "preco": 129.90,
-            "estoque": 35,
+            "titulo": "Interestelar",
+            "descricao": "Viagem espacial",
+            "ano": 2014,
+            "duracao": 169,
+            "estoque": 3,
             "categoria_id": categoria["id"],
         },
     )

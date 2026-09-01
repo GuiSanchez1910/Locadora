@@ -19,9 +19,11 @@ def create_app(config_name: str | None = None) -> Flask:
     from app import models  # noqa: F401
     from app.routes.cliente_routes import cliente_bp
     from app.routes.categoria_routes import categoria_bp
+    from app.routes.filme_routes import filme_bp
 
     app.register_blueprint(cliente_bp, url_prefix="/api/clientes")
     app.register_blueprint(categoria_bp, url_prefix="/api/categorias")
+    app.register_blueprint(filme_bp, url_prefix="/api/filmes")
 
     register_error_handlers(app)
 
