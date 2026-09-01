@@ -1,6 +1,9 @@
 from app.schemas.cliente_schema import cliente_schema, clientes_schema
+from app.schemas.categoria_schema import categoria_schema, categorias_schema
 
 __all__ = [
     "cliente_schema",
     "clientes_schema",
+    "categoria_schema",
+    "categorias_schema",
 ]

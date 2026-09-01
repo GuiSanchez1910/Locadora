@@ -5,5 +5,6 @@ registradas no metadata antes de o Flask-Migrate comparar com o banco.
 """
 
 from app.models.cliente import Cliente
+from app.models.categoria import Categoria
 
-__all__ = ["Cliente"]
+__all__ = ["Cliente", "Categoria"]
