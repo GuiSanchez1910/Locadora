@@ -313,7 +313,84 @@ Resposta:
 
 ```json
 {
-    "message": "Cliente removido com sucesso."
+    ""
+}
+```
+
+Status:
+
+```text
+204 NO CONTENT
+```
+
+# API de Categorias
+
+A API possui operações de criação, consulta, atualização e remoção de categorias.
+
+## Criar categoria
+
+```http
+POST http://127.0.0.1:5000/api/categorias
+```
+
+Body:
+
+```json
+{
+    "nome": "Ficção Científica",
+}
+```
+
+Resposta esperada:
+
+```json
+{
+    "id": 1,
+    "nome": "Ficção Científica"
+}
+```
+
+Status:
+
+```text
+201 Created
+```
+
+## Listar categorias
+
+```http
+GET http://127.0.0.1:5000/api/categorias
+```
+
+Resposta:
+
+```json
+[
+    {
+        "id": 1,
+        "nome": "Ficção Científica"
+    }
+]
+```
+
+Status:
+
+```text
+200 OK
+```
+
+## Buscar categoria por ID
+
+```http
+GET http://127.0.0.1:5000/api/categorias/1
+```
+
+Resposta:
+
+```json
+{
+    "id": 1,
+    "nome": "Ficção Científica"
 }
 ```
 
@@ -323,9 +400,73 @@ Status:
 200 OK
 ```
 
+## Atualizar categoria — PUT
+
+O `PUT` substitui os dados da categorias. Todos os campos obrigatórios devem ser enviados.
+
+```http
+PUT http://127.0.0.1:5000/api/categorias/1
+```
+
+Body:
+
+```json
+{
+    "nome": "Ação"
+}
+```
+
+Status:
+
+```text
+200 OK
+```
+
+## Atualizar categoria — PATCH
+
+O `PATCH` permite alterar apenas os campos desejados.
+
+```http
+PATCH http://127.0.0.1:5000/api/categorias/1
+```
+
+Body:
+
+```json
+{
+    "nome": "Aventura"
+}
+```
+
+Status:
+
+```text
+200 OK
+```
+
+## Remover categoria
+
+```http
+DELETE http://127.0.0.1:5000/api/categorias/1
+```
+
+Resposta:
+
+```json
+{
+    ""
+}
+```
+
+Status:
+
+```text
+204 NO CONTENT
+```
+
 # Tratamento de erros
 
-A API possui tratamento centralizado de erros através do arquivo `errors.py`.
+As API's possuem tratamentos centralizados de erros através do arquivo `errors.py`.
 
 ## Erro de validação — 422
 
@@ -443,15 +584,21 @@ Status:
 
 # Resumo dos endpoints
 
-| Método | Endpoint             | Descrição                       | Status |
-| ------ | -------------------- | ------------------------------- | ------ |
-| GET    | `/health`            | Verifica o funcionamento da API | 200    |
-| GET    | `/api/clientes`      | Lista todos os clientes         | 200    |
-| GET    | `/api/clientes/{id}` | Busca um cliente por ID         | 200    |
-| POST   | `/api/clientes`      | Cria um novo cliente            | 201    |
-| PUT    | `/api/clientes/{id}` | Substitui os dados do cliente   | 200    |
-| PATCH  | `/api/clientes/{id}` | Atualiza parcialmente o cliente | 200    |
-| DELETE | `/api/clientes/{id}` | Remove um cliente               | 200    |
+| Método | Endpoint              | Descrição                        | Status |
+| ------ | --------------------- | -------------------------------- | ------ |
+| GET    | `/health`             | Verifica o funcionamento da API  | 200    |
+| GET    | `/api/clientes`       | Lista todos os clientes          | 200    |
+| GET    | `/api/clientes/{id}`  | Busca um cliente por ID          | 200    |
+| POST   | `/api/clientes`       | Cria um novo cliente             | 201    |
+| PUT    | `/api/clientes/{id}`  | Substitui os dados do cliente    | 200    |
+| PATCH  | `/api/clientes/{id}`  | Atualiza parcialmente o cliente  | 200    |
+| DELETE | `/api/clientes/{id}`  | Remove um cliente                | 200    |
+| GET    | `/api/categorias`     | Lista todas as categorias        | 200    |
+| GET    | `/api/categorias/{id}`| Busca uma categoria por ID       | 200    |
+| POST   | `/api/categorias`     | Cria uma nova categria           | 201    |
+| PUT    | `/api/categorias/{id}`| Substitui os dados da categoria  | 200    |
+| PATCH  | `/api/categorias/{id}`| Atualiza parcialmente a categoria| 200    |
+| DELETE | `/api/categorias/{id}`| Remove uma categoria             | 200    |
 
 ## Fluxo para executar o projeto após o clone
 
