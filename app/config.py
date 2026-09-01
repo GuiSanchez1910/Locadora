@@ -12,9 +12,7 @@ class Config:
     """Configuração comum a todos os ambientes."""
 
     SECRET_KEY = os.getenv("SECRET_KEY", "chave-insegura-apenas-para-aula")
-    SQLALCHEMY_DATABASE_URI = os.getenv(
-        "DATABASE_URL", f"sqlite:///{BASE_DIR / 'catalogo.db'}"
-    )
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
     # Desligado por padrão desde o Flask-SQLAlchemy 3.x; mantido explícito
     # porque a turma vai ver esse nome em tutoriais antigos.
     SQLALCHEMY_TRACK_MODIFICATIONS = False
