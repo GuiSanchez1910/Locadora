@@ -14,11 +14,3 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
 ma = Marshmallow()
-
-
-@event.listens_for(Engine, "connect")
-def _habilitar_foreign_keys_no_sqlite(dbapi_connection, connection_record):
-    if isinstance(dbapi_connection, sqlite3.Connection):
-        cursor = dbapi_connection.cursor()
-        cursor.execute("PRAGMA foreign_keys=ON")
-        cursor.close()
