@@ -64,7 +64,7 @@ def remover(locacao_id: int) -> None:
 def devolver(locacao_id: int) -> Locacao:
     locacao = obter(locacao_id)
 
-    if not locacao.status:
+    if locacao.status == "DEVOLVIDA":
         raise RegraDeNegocio("Locação já foi devolvida.")
 
     filme = db.session.get(Filme, locacao.filme_id)
