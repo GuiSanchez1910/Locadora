@@ -105,7 +105,7 @@ USE locadora;
 SHOW TABLES;
 ```
 
-As tabelas `clientes`, `categorias` e `filmes` deverão estar presentes.
+As tabelas `clientes`, `categorias`, `filmes` e `locacoes` deverão estar presentes.
 
 Para verificar a estrutura de `filmes`:
 
@@ -696,6 +696,202 @@ Status:
 200 OK
 ```
 
+# API de Locações
+
+A API possui operações de criação, consulta, atualização e remoção de locações, além de devolução.
+
+A locação deve estar associada a um cliente e a um filme já cadastrados. O filme precisa estar disponível (`estoque > 0`) no momento da criação. Os campos `data_locacao`, `data_devolucao` e `status` são calculados pelo sistema e não devem ser enviados no payload. Ao criar uma locação, o `estoque` do filme associado é reduzido em 1; ao devolver, é aumentado em 1.
+
+## Criar locação
+
+```http
+POST http://127.0.0.1:5000/api/locacoes
+```
+
+Body:
+
+```json
+{
+    "cliente_id": 1,
+    "filme_id": 1,
+    "data_devolucao_prevista": "2026-09-10T00:00:00",
+    "valor": "25.00"
+}
+```
+
+Resposta esperada:
+
+```json
+{
+    "id": 1,
+    "cliente_id": 1,
+    "filme_id": 1,
+    "data_locacao": "2026-09-02T14:00:00",
+    "data_devolucao_prevista": "2026-09-10T00:00:00",
+    "data_devolucao": null,
+    "valor": "25.00",
+    "status": true
+}
+```
+
+Status:
+
+```text
+201 Created
+```
+
+## Listar locações
+
+```http
+GET http://127.0.0.1:5000/api/locacoes
+```
+
+Resposta:
+
+```json
+[
+    {
+        "id": 1,
+        "cliente_id": 1,
+        "filme_id": 1,
+        "data_locacao": "2026-09-02T14:00:00",
+        "data_devolucao_prevista": "2026-09-10T00:00:00",
+        "data_devolucao": null,
+        "valor": "25.00",
+        "status": true
+    }
+]
+```
+
+Status:
+
+```text
+200 OK
+```
+
+## Buscar locação por ID
+
+```http
+GET http://127.0.0.1:5000/api/locacoes/1
+```
+
+Resposta:
+
+```json
+{
+    "id": 1,
+    "cliente_id": 1,
+    "filme_id": 1,
+    "data_locacao": "2026-09-02T14:00:00",
+    "data_devolucao_prevista": "2026-09-10T00:00:00",
+    "data_devolucao": null,
+    "valor": "25.00",
+    "status": true
+}
+```
+
+Status:
+
+```text
+200 OK
+```
+
+## Atualizar locação — PUT
+
+O `PUT` substitui os dados da locação. Os campos obrigatórios (`cliente_id`, `filme_id`, `data_devolucao_prevista` e `valor`) devem ser enviados.
+
+```http
+PUT http://127.0.0.1:5000/api/locacoes/1
+```
+
+Body:
+
+```json
+{
+    "cliente_id": 1,
+    "filme_id": 1,
+    "data_devolucao_prevista": "2026-09-12T00:00:00",
+    "valor": "30.00"
+}
+```
+
+Status:
+
+```text
+200 OK
+```
+
+## Atualizar locação — PATCH
+
+O `PATCH` permite alterar apenas os campos desejados.
+
+```http
+PATCH http://127.0.0.1:5000/api/locacoes/1
+```
+
+Body:
+
+```json
+{
+    "valor": "30.00"
+}
+```
+
+Status:
+
+```text
+200 OK
+```
+
+## Remover locação
+
+```http
+DELETE http://127.0.0.1:5000/api/locacoes/1
+```
+
+Resposta:
+
+```json
+{
+    ""
+}
+```
+
+Status:
+
+```text
+204 NO CONTENT
+```
+
+## Devolver locação
+
+Ao devolver, o `status` é atualizado para `false`, a `data_devolucao` é preenchida com a data atual e o `estoque` do filme é aumentado em 1.
+
+```http
+POST http://127.0.0.1:5000/api/locacoes/1/devolver
+```
+
+Resposta esperada:
+
+```json
+{
+    "id": 1,
+    "cliente_id": 1,
+    "filme_id": 1,
+    "data_locacao": "2026-09-02T14:00:00",
+    "data_devolucao_prevista": "2026-09-10T00:00:00",
+    "data_devolucao": "2026-09-05T09:30:00",
+    "valor": "25.00",
+    "status": false
+}
+```
+
+Status:
+
+```text
+200 OK
+```
+
 # Tratamento de erros
 
 As API's possuem tratamentos centralizados de erros através do arquivo `errors.py`.
@@ -921,6 +1117,110 @@ Status:
 409 Conflict
 ```
 
+## Locação não encontrada — 404
+
+```http
+GET http://127.0.0.1:5000/api/locacoes/9999
+```
+
+Resposta:
+
+```json
+{
+    "code": 404,
+    "name": "RecursoNaoEncontrado",
+    "description": "Locação 9999 não encontrada."
+}
+```
+
+Status:
+
+```text
+404 Not Found
+```
+
+## Cliente ou filme inexistente na locação — 422
+
+Ao criar uma locação com `cliente_id` ou `filme_id` que não existem:
+
+```json
+{
+    "cliente_id": 999,
+    "filme_id": 1,
+    "data_devolucao_prevista": "2026-09-10T00:00:00",
+    "valor": "25.00"
+}
+```
+
+Resposta:
+
+```json
+{
+    "code": 422,
+    "name": "ReferenciaInvalida",
+    "description": "Cliente 999 não encontrado."
+}
+```
+
+Status:
+
+```text
+422 Unprocessable Entity
+```
+
+## Filme indisponível para nova locação — 409
+
+Ao tentar criar uma locação para um filme com estoque `0`:
+
+```json
+{
+    "cliente_id": 1,
+    "filme_id": 1,
+    "data_devolucao_prevista": "2026-09-10T00:00:00",
+    "valor": "25.00"
+}
+```
+
+Resposta:
+
+```json
+{
+    "code": 409,
+    "name": "RegraDeNegocio",
+    "description": "Filme indisponível para locação."
+}
+```
+
+Status:
+
+```text
+409 Conflict
+```
+
+## Locação já devolvida — 409
+
+Ao tentar devolver uma locação que já foi devolvida:
+
+```http
+POST http://127.0.0.1:5000/api/locacoes/1/devolver
+```
+
+Resposta:
+
+```json
+{
+    "code": 409,
+    "name": "RegraDeNegocio",
+    "description": "Locação já foi devolvida."
+}
+```
+
+Status:
+
+```text
+409 Conflict
+```
+
 # Resumo dos endpoints
 
 | Método | Endpoint              | Descrição                        | Status |
@@ -946,6 +1246,13 @@ Status:
 | DELETE | `/api/filmes/{id}`    | Remove um filme                  | 200    |
 | POST   | `/api/filmes/{id}/alugar` | Aluga um filme (reduz estoque) | 200    |
 | POST   | `/api/filmes/{id}/devolver` | Devolve um filme (aumenta estoque) | 200 |
+| GET    | `/api/locacoes`       | Lista todas as locações          | 200    |
+| GET    | `/api/locacoes/{id}`  | Busca uma locação por ID         | 200    |
+| POST   | `/api/locacoes`       | Cria uma nova locação            | 201    |
+| PUT    | `/api/locacoes/{id}`  | Substitui os dados da locação    | 200    |
+| PATCH  | `/api/locacoes/{id}`  | Atualiza parcialmente a locação  | 200    |
+| DELETE | `/api/locacoes/{id}`  | Remove uma locação                | 200    |
+| POST   | `/api/locacoes/{id}/devolver` | Devolve uma locação (aumenta estoque do filme) | 200 |
 
 ## Fluxo para executar o projeto após o clone
 
