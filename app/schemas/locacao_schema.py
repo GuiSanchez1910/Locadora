@@ -14,7 +14,15 @@ class LocacaoSchema(ma.SQLAlchemyAutoSchema):
     data_devolucao_prevista = fields.DateTime(required=True)
     data_devolucao = fields.DateTime(allow_none=True)
     valor = fields.Decimal(as_string=True, required=True, validate=validate.Range(min=0))
-    status = fields.Boolean(dump_only=True)
+    status = fields.String(dump_only=True)
+    cliente_nome = fields.Method("get_cliente_nome", dump_only=True)
+    filme_titulo = fields.Method("get_filme_titulo", dump_only=True)
+
+    def get_cliente_nome(self, obj):
+        return obj.cliente.nome
+
+    def get_filme_titulo(self, obj):
+        return obj.filme.titulo
 
 locacao_schema = LocacaoSchema()
 locacoes_schema = LocacaoSchema(many=True)

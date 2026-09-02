@@ -1,9 +1,12 @@
-from datetime import datetime, timezone
 from app.errors import RecursoNaoEncontrado, ReferenciaInvalida, RegraDeNegocio
 from app.extensions import db
 from app.models.cliente import Cliente
 from app.models.filme import Filme
 from app.models.locacao import Locacao
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+FUSO_BRASIL = ZoneInfo("America/Sao_Paulo")
 
 def listar() -> list[Locacao]:
     stmt = db.select(Locacao).order_by(Locacao.data_locacao.desc())
@@ -23,8 +26,8 @@ def criar(dados: dict) -> Locacao:
     if not filme.disponivel:
         raise RegraDeNegocio("Filme indisponível para locação.")
 
-    dados.setdefault("data_locacao", datetime.now(timezone.utc))
-    dados.setdefault("status", True)
+    dados.setdefault("data_locacao", datetime.now(FUSO_BRASIL))
+    dados.setdefault("status", "ATIVA")
 
     locacao = Locacao(**dados)
 
@@ -68,8 +71,8 @@ def devolver(locacao_id: int) -> Locacao:
     if filme is None:
         raise RecursoNaoEncontrado(f"Filme {locacao.filme_id} não encontrado.")
 
-    locacao.status = False
-    locacao.data_devolucao = datetime.now(timezone.utc)
+    locacao.status = "DEVOLVIDA"
+    locacao.data_devolucao = datetime.now(FUSO_BRASIL)
 
     filme.estoque += 1
     _sincronizar_disponibilidade(filme)

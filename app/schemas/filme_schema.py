@@ -18,6 +18,10 @@ class FilmeSchema(ma.SQLAlchemyAutoSchema):
     estoque = fields.Integer(load_default=0, validate=validate.Range(min=0))
     disponivel = fields.Boolean(dump_only=True)
     categoria_id = fields.Integer(required=True)
+    categoria_nome = fields.Method("get_categoria_nome", dump_only=True)
+
+    def get_categoria_nome(self, obj):
+        return obj.categoria.nome
 
 
 filme_schema = FilmeSchema()
