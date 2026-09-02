@@ -1,6 +1,6 @@
 # Sistema de Locadora de Filmes
 
-## Collection do Postman: https://guilherme-sanchez1910-9436232.postman.co/workspace/Guilherme-Cerqueira-Sanchez's-W~a32690b6-ee80-4292-8e17-9c66449dcdd1/folder/53658045-2be3cacb-b9f0-4881-a1a0-95c54f30fdc6?action=share&source=copy-link&creator=53658045
+## Collection do Postman esta no arquivo 'Locadora.postman_collection.json'
 
 ## Instalação
 
