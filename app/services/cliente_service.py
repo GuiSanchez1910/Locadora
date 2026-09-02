@@ -19,6 +19,7 @@ def obter(cliente_id: int) -> Cliente:
 def criar(dados: dict) -> Cliente:
     _garantir_cpf_disponivel(dados["cpf"])
     _garantir_email_disponivel(dados["email"])
+    _garantir_telefone_disponivel(dados["telefone"])
 
     cliente = Cliente(**dados)
 
@@ -67,3 +68,12 @@ def _garantir_email_disponivel(
 
     if db.session.scalar(stmt) is not None:
         raise RegraDeNegocio("E-mail já cadastrado.")
+
+def _garantir_telefone_disponivel(telefone: str, cliente_id: int | None = None) -> None:
+    stmt = db.select(Cliente).where(Cliente.telefone == telefone)
+
+    if cliente_id is not None:
+        stmt = stmt.where(Cliente.id != cliente_id)
+
+    if db.session.scalar(stmt) is not None:
+        raise RegraDeNegocio("Telefone já cadastrado.")

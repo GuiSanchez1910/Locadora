@@ -9,7 +9,7 @@ class Cliente(db.Model):
     nome: Mapped[str] = mapped_column(String(100), nullable=False)
     cpf: Mapped[str] = mapped_column(String(11), unique = True, nullable = False)
     email: Mapped[str] = mapped_column(String(150), unique = True, nullable = False)
-    telefone: Mapped[str] = mapped_column(String(20), nullable=False)
+    telefone: Mapped[str] = mapped_column(String(20), unique = True, nullable=False)
 
     def __repr__(self) -> str:
         return f"<Cliente {self.nome}>"
