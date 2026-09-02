@@ -13,7 +13,7 @@ class LocacaoSchema(ma.SQLAlchemyAutoSchema):
     data_locacao = fields.DateTime(dump_only=True)
     data_devolucao_prevista = fields.DateTime(required=True)
     data_devolucao = fields.DateTime(allow_none=True)
-    valor = fields.Decimal(as_string=True, dump_only=True)
+    valor = fields.Decimal(as_string=True, required=True, validate=validate.Range(min=0))
     status = fields.Boolean(dump_only=True)
 
 locacao_schema = LocacaoSchema()
