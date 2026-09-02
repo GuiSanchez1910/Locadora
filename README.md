@@ -1,6 +1,7 @@
 # Sistema de Locadora de Filmes
 
 ## Collection do Postman esta no arquivo 'Locadora.postman_collection.json'
+## Link da collection do postman: https://www.postman.com/guilhermekre-1053921/workspace/locadora/collection/47451270-aec722c5-e188-42c6-8e99-c5d13ee35acd?action=share&source=copy-link&creator=47451270
 
 ## Instalação
 
