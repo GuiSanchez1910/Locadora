@@ -37,6 +37,9 @@ def atualizar(cliente_id: int, dados: dict) -> Cliente:
     if "email" in dados:
         _garantir_email_disponivel(dados["email"], cliente_id)
 
+    if "telefone" in dados:
+        _garantir_telefone_disponivel(dados["telefone"], cliente_id)
+
     for campo, valor in dados.items():
         setattr(cliente, campo, valor)
 
